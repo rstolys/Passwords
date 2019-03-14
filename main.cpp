@@ -2,7 +2,11 @@
 #include <vector> 
 #include <string>
 #include <fstream>
+
 #include "password.hpp"
+#include "AESencryption.hpp"
+
+using namespace std;
 
 bool authentification(); 
 void menu(); 
@@ -10,6 +14,8 @@ void menu();
 int main() {
     
     if (authentification()) {
+        
+        //Call function to handle user inputs
         menu();
     }
 
@@ -17,61 +23,93 @@ int main() {
 }
 
 bool authentification() {
-    std::string master_pass = "1";          //Master Password
-    std::string guess;                      //Master Password Guess
-    int trys = 1;                           //First attempt is try 
+
+    string master_pass = "SFUnc2019!";          //Master Password
+    string guess;                               //Master Password Guess
+    int trys = 1;                               //First attempt is try 
 
     while (true) {                       //Master Password Authentification
-        std::cout << "Enter Password: \n"; 
-        std::cin >> guess; 
+        
+        //Prompt user to enter password
+        cout << "Enter Password: \n"; 
+        cin >> guess; 
+
+        //If guess is correct
         if (guess == master_pass) {         //Must be perfect match             
+           
+            //Permit access
             return true;
         }
         else {
-            std::cout << "Password is wrong\n";
-            if (trys == 3) {            //Allow only 3 trys
-                std::cout << "Program Terminating\n"; 
+
+            //Indicate incorrect password
+            cout << "Password is wrong\n";
+
+            //If incorrect password is entered 3 times, terminate program 
+            if (trys > 2) {  
+
+                cout << "Program Terminating\n"; 
                 return false;
             }
+
+            //Increment number of tries 
             trys++; 
         }
     }
 }
 
 void menu() {
-    std::string choice_s; 
-    int choice;                         //Menu Selection
 
+    int     iChoice;             
+
+    //Loop until exit 
     while (true) {
-        std::cout << "Options: \n"; 
-        std::cout << "\t 1. Add Password\n";
-        std::cout << "\t 2. Look Up Password\n";
-        std::cout << "\t 3. Delete Password\n";
-        std::cout << "\t 4. Exit Program\n";
-        std::cout << "Enter your choice: "; 
+
+        //Display menu options
+        cout << "Options: \n"; 
+        cout << "\t 1. Add Password\n";
+        cout << "\t 2. Look Up Password\n";
+        cout << "\t 3. Delete Password\n";
+        cout << "\t 4. Exit Program\n";
+        cout << "Enter your choice: "; 
         
-        if (!(std::cin >> choice)) {
-            std::cout << "Error in entry. Please enter an integer\n\n";
-            std::cin.clear(); 
-            std::cin.ignore(100,'\n');
+        //If input is not an integer
+        if (!(cin >> iChoice)) {
+
+            //indicate error and prompt another attempt
+            cout << "Error in entry. Please enter an integer\n\n";
+
+            cin.clear(); 
+            cin.ignore(100,'\n');
+
             continue; 
         }  
 
-        switch (choice) {
-            case 1: 
-                add_pass();
-                break;
-            case 2: 
-                look_up(); 
-                break;
-            case 3: 
-                delete_pass();
-                break;   
-            case 4: 
-                exit(-1);
-            default: 
-                std::cout << "Error in entry. Please one of the options\n\n"; 
-                break; 
+        switch (iChoice) 
+        {
+        case ADD_PASSWORD: 
+            
+            add_pass();
+            break;
+
+        case LOOK_UP: 
+        
+            look_up(); 
+            break;
+
+        case DELETE_PASSWORD: 
+            
+            delete_pass();
+            break;
+
+        case EXIT: 
+            
+            exit(-1);
+
+        default: 
+
+            cout << "Error in entry. Please one of the options\n\n"; 
+            break; 
         }
     }
     return;

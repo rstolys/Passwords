@@ -5,7 +5,7 @@
 
 using namespace std;
 
-void generate(std::string word);
+void generate(string word);
 
 
 int main() {
@@ -15,7 +15,7 @@ int main() {
     return 0; 
 }
 
-void generate(std::string word) {
+void generate(string word) {
     int location_s; 
     int location_C;
     int special_chars = 14;         //Number of special characters in ASCII
@@ -45,7 +45,7 @@ void generate(std::string word) {
             char_i =  (rand() % capital) + 65;
             cout << (char)char_i;
         }
-        cout << std::hex <<(int)word[i]; 
+        cout << hex <<(int)word[i]; 
     }
     cout << endl;
 }
