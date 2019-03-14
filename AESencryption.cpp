@@ -1,5 +1,5 @@
-#include <iostream> 
-#include <vector> 
+#include <iostream>
+#include <vector>
 #include <string>
 
 #include "AESencryption.hpp"
@@ -10,7 +10,7 @@ typedef uint8_t state_t[4][4];
 
 
 //sbox for subBytes Step
-static const uint8_t sbox[256] = 
+static const uint8_t sbox[256] =
 { //0     1    2      3     4    5     6     7      8    9     A      B    C     D     E     F
   0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
   0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0, 0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0,
@@ -31,7 +31,7 @@ static const uint8_t sbox[256] =
 
 
 //sboxInv for subBytesInv Step
-static const uint8_t sboxInv[256] = 
+static const uint8_t sboxInv[256] =
 { //0     1    2      3     4    5     6     7      8    9     A      B    C     D     E     F
   0x52, 0x09, 0x6a, 0xd5, 0x30, 0x36, 0xa5, 0x38, 0xbf, 0x40, 0xa3, 0x9e, 0x81, 0xf3, 0xd7, 0xfb,
   0x7c, 0xe3, 0x39, 0x82, 0x9b, 0x2f, 0xff, 0x87, 0x34, 0x8e, 0x43, 0x44, 0xc4, 0xde, 0xe9, 0xcb,
@@ -52,15 +52,15 @@ static const uint8_t sboxInv[256] =
 
 
 
-//Rcon for generting Key Schedule 
-static const uint8_t Rcon[11] = 
+//Rcon for generting Key Schedule
+static const uint8_t Rcon[11] =
 { 0x8d, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36 };
-  //element [0] is not used 
+  //element [0] is not used
 
 //Default Key
-static const uint8_t defaultKey_gv[16] = 
-{ 0x2b, 0x28, 0xab, 0x09, 
-  0x7e, 0xae, 0xf7, 0xcf, 
+static const uint8_t defaultKey_gv[16] =
+{ 0x2b, 0x28, 0xab, 0x09,
+  0x7e, 0xae, 0xf7, 0xcf,
   0x15, 0xd2, 0x15, 0x4f,
   0x16, 0xa6, 0x88, 0x3c };
 
@@ -95,10 +95,10 @@ void encrpyt(char password[16], char *ID);
 
 
 /////////////////////////////////////////////////////////////////////
-/// Implements subBytes Step 
-/// 
-/// @param[in/out]  state_t     16 byte message to by encrpyted    
-/// 
+/// Implements subBytes Step
+///
+/// @param[in/out]  state_t     16 byte message to by encrpyted
+///
 /////////////////////////////////////////////////////////////////////
 void subBytes(uint8_t state_t[4][4])
 {
@@ -108,7 +108,7 @@ void subBytes(uint8_t state_t[4][4])
         for (j = 0; j < 4; j++)
         {
 
-            //Determine the new value of the element 
+            //Determine the new value of the element
             state_t[i][j] = sbox[ state_t[i][j] ];
         }
     }
@@ -117,10 +117,10 @@ void subBytes(uint8_t state_t[4][4])
 }
 
 /////////////////////////////////////////////////////////////////////
-/// Implements shiftRows Step 
-/// 
-/// @param[in/out]  state_t     16 byte message to by encrpyted    
-/// 
+/// Implements shiftRows Step
+///
+/// @param[in/out]  state_t     16 byte message to by encrpyted
+///
 /////////////////////////////////////////////////////////////////////
 void shiftRows(uint8_t state_t[4][4])
 {
@@ -156,14 +156,14 @@ void shiftRows(uint8_t state_t[4][4])
 
 
 /////////////////////////////////////////////////////////////////////
-/// Implements mixColumns Step 
-/// 
-/// @param[in/out]  state_t     16 byte message to by encrpyted   
-/// 
+/// Implements mixColumns Step
+///
+/// @param[in/out]  state_t     16 byte message to by encrpyted
+///
 /////////////////////////////////////////////////////////////////////
 void mixColumns(uint8_t state_t[4][4])
 {
-    //Involves a matrix multiplcation of each column with the following matrix 
+    //Involves a matrix multiplcation of each column with the following matrix
                 /******************
                 *  2   3   1   1  *
                 *  1   2   3   1  *
@@ -180,12 +180,12 @@ void mixColumns(uint8_t state_t[4][4])
 
   /*
    * high_bit is 0xff if the high bit of state_t[i] is set, 0 otherwise
-   * 
+   *
    * arithmetic right shift brings in either zeros or ones
    * implicitly removes high bit because state_x2[i] is an 8-bit char, so we xor by 0x1b and not 0x11b in the next line
-   * 
-   * 
-   * 
+   *
+   *
+   *
   */
 
   //For each column
@@ -193,45 +193,45 @@ void mixColumns(uint8_t state_t[4][4])
 
     for (i = 0; i < 4; i++) {
 
-      //Copy current state matrix 
-      state_copy[i] = state_t[i][j]; 
+      //Copy current state matrix
+      state_copy[i] = state_t[i][j];
 
-      //If high bit is set, make high_bit = 1111 1111 other wise = 0000 0000       
+      //If high bit is set, make high_bit = 1111 1111 other wise = 0000 0000
       high_bit = state_t[i][j] & 0x80 ? 0xff : 0x00;
 
-      //left shift all bits for multiplication by 2 
-      state_x2[i] = state_t[i][j] << 1; 
+      //left shift all bits for multiplication by 2
+      state_x2[i] = state_t[i][j] << 1;
 
       //XOR with 0x1b if high bit is set
-      state_x2[i] ^= 0x1b & high_bit; 
+      state_x2[i] ^= 0x1b & high_bit;
     }
 
-    //Set each element of the column 
+    //Set each element of the column
 
-    //                2* a0     +      a3       +     a2        +          3 * a1  
-    state_t[0][j] = state_x2[0] ^ state_copy[3] ^ state_copy[2] ^ (state_x2[1] ^ state_copy[1]); 
+    //                2* a0     +      a3       +     a2        +          3 * a1
+    state_t[0][j] = state_x2[0] ^ state_copy[3] ^ state_copy[2] ^ (state_x2[1] ^ state_copy[1]);
 
     //                2* a1     +      a0       +     a3        +          3 * a2
     state_t[1][j] = state_x2[1] ^ state_copy[0] ^ state_copy[3] ^ (state_x2[2] ^ state_copy[2]);
 
-    //                2* a2     +      a1       +     a0        +          3 * a3 
+    //                2* a2     +      a1       +     a0        +          3 * a3
     state_t[2][j]= state_x2[2] ^ state_copy[1] ^ state_copy[0] ^ (state_x2[3] ^ state_copy[3]);
 
-    //                2* a3     +      a2       +     a1        +          3 * a0 
-    state_t[3][j] = state_x2[3] ^ state_copy[2] ^ state_copy[1] ^ (state_x2[0] ^ state_copy[0]); 
+    //                2* a3     +      a2       +     a1        +          3 * a0
+    state_t[3][j] = state_x2[3] ^ state_copy[2] ^ state_copy[1] ^ (state_x2[0] ^ state_copy[0]);
 
     //Reset high bit
     high_bit = 0x00;
-  
+
   }
 }
 
 /////////////////////////////////////////////////////////////////////
-/// Implements addRoundKey Step 
-/// 
-/// @param[in]      RoundKey    Key to modify message 
-/// @param[in/out]  state_t     16 byte message to by encrpyted    
-/// 
+/// Implements addRoundKey Step
+///
+/// @param[in]      RoundKey    Key to modify message
+/// @param[in/out]  state_t     16 byte message to by encrpyted
+///
 /////////////////////////////////////////////////////////////////////
 void addRoundKey(uint8_t state_t[4][4], uint8_t RoundKey[4][4])
 {
@@ -257,10 +257,10 @@ void addRoundKey(uint8_t state_t[4][4], uint8_t RoundKey[4][4])
 /////////////////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////////////////////
-/// Implements subBytesInv Step 
-/// 
-/// @param[in/out]  state_t     16 byte message to by decrpyted    
-/// 
+/// Implements subBytesInv Step
+///
+/// @param[in/out]  state_t     16 byte message to by decrpyted
+///
 /////////////////////////////////////////////////////////////////////
 void subBytesInv(uint8_t state_t[4][4])
 {
@@ -270,7 +270,7 @@ void subBytesInv(uint8_t state_t[4][4])
       for (j = 0; j < 4; j++)
       {
 
-          //Determine the new value of the element 
+          //Determine the new value of the element
           state_t[i][j] = sboxInv[ state_t[i][j] ];
       }
   }
@@ -279,10 +279,10 @@ void subBytesInv(uint8_t state_t[4][4])
 }
 
 /////////////////////////////////////////////////////////////////////
-/// Implements shiftRowsInv Step 
-/// 
-/// @param[in/out]  state_t     16 byte message to by decrpyted    
-/// 
+/// Implements shiftRowsInv Step
+///
+/// @param[in/out]  state_t     16 byte message to by decrpyted
+///
 /////////////////////////////////////////////////////////////////////
 void shiftRowsInv(uint8_t state_t[4][4])
 {
@@ -317,14 +317,14 @@ void shiftRowsInv(uint8_t state_t[4][4])
 }
 
 /////////////////////////////////////////////////////////////////////
-/// Implements mixColumns Step 
-/// 
-/// @param[in/out]  state_t     16 byte message to by decrpyted   
-/// 
+/// Implements mixColumns Step
+///
+/// @param[in/out]  state_t     16 byte message to by decrpyted
+///
 /////////////////////////////////////////////////////////////////////
 void mixColumnsInv(uint8_t state_t[4][4])
 {
-   //Involves a matrix multiplcation of each column with the following matrix 
+   //Involves a matrix multiplcation of each column with the following matrix
                 /******************
                 *  0e  0b  0d  09  *
                 *  09  0e  0b  0d  *
@@ -338,17 +338,17 @@ void mixColumnsInv(uint8_t state_t[4][4])
   //For each column
   for(j = 0; j < 4; j++) {
 
-    //For each byte in each column 
+    //For each byte in each column
     for(i = 0; i < 4; i++) {
 
-      //Copy current state matrix 
+      //Copy current state matrix
       state_copy[i] = state_t[i][j];
 
     }
 
     //Set all the elements of the column
 
-    state_t[0][j] = x14time(state_copy[0]) ^ x11time(state_copy[1]) ^ x13time(state_copy[2]) ^ x9time(state_copy[3]); 
+    state_t[0][j] = x14time(state_copy[0]) ^ x11time(state_copy[1]) ^ x13time(state_copy[2]) ^ x9time(state_copy[3]);
 
     state_t[1][j] = x9time(state_copy[0]) ^ x14time(state_copy[1]) ^ x11time(state_copy[2]) ^ x13time(state_copy[3]);
 
@@ -360,11 +360,11 @@ void mixColumnsInv(uint8_t state_t[4][4])
 }
 
 /////////////////////////////////////////////////////////////////////
-///  used for mixColumns and mixColumnsInv multiplcation by two 
-/// 
-/// @param[in]  x           byte to be modified    
-/// 
-/// @return     uint8_t     modified result of operations to x  
+///  used for mixColumns and mixColumnsInv multiplcation by two
+///
+/// @param[in]  x           byte to be modified
+///
+/// @return     uint8_t     modified result of operations to x
 /////////////////////////////////////////////////////////////////////
 static uint8_t x2time(uint8_t x)
 {
@@ -375,8 +375,8 @@ static uint8_t x2time(uint8_t x)
 
     xOR_1B = true;
   }
-  
-  //bit shift 1 to left 
+
+  //bit shift 1 to left
   x <<= 1;
 
   if(xOR_1B) {
@@ -384,23 +384,23 @@ static uint8_t x2time(uint8_t x)
     //XOR with 0x1b
     x ^= 0x1b;
   }
-  
+
   return x;
 
 }
 
 /////////////////////////////////////////////////////////////////////
-/// used for mixColumns and mixColumnsInv multiplcation by three 
-/// 
-/// @param[in]  x           byte to be modified    
-/// 
-/// @return     uint8_t     modified result of operations to x  
+/// used for mixColumns and mixColumnsInv multiplcation by three
+///
+/// @param[in]  x           byte to be modified
+///
+/// @return     uint8_t     modified result of operations to x
 /////////////////////////////////////////////////////////////////////
 static uint8_t x3time(uint8_t x)
 {
   int   y;
-  
-  //Do multiplcation by 2; 
+
+  //Do multiplcation by 2;
   y = x2time(x);
 
   //XOR with result and original byte
@@ -411,11 +411,11 @@ static uint8_t x3time(uint8_t x)
 }
 
 /////////////////////////////////////////////////////////////////////
-/// used for mixColumns and mixColumnsInv multiplcation by nine 
-/// 
-/// @param[in]  x           byte to be modified    
-/// 
-/// @return     uint8_t     modified result of operations to x  
+/// used for mixColumns and mixColumnsInv multiplcation by nine
+///
+/// @param[in]  x           byte to be modified
+///
+/// @return     uint8_t     modified result of operations to x
 /////////////////////////////////////////////////////////////////////
 static uint8_t x9time(uint8_t x)
 {
@@ -425,7 +425,7 @@ static uint8_t x9time(uint8_t x)
 
   //Copy value
   int   y = x;
-  
+
   //Do multiplcation by 2, 3 times
   for(i = 0; i < 3; i++) {
 
@@ -440,11 +440,11 @@ static uint8_t x9time(uint8_t x)
 }
 
 /////////////////////////////////////////////////////////////////////
-/// used for mixColumns and mixColumnsInv multiplcation by eleven 
-/// 
-/// @param[in]  x           byte to be modified    
-/// 
-/// @return     uint8_t     modified result of operations to x  
+/// used for mixColumns and mixColumnsInv multiplcation by eleven
+///
+/// @param[in]  x           byte to be modified
+///
+/// @return     uint8_t     modified result of operations to x
 /////////////////////////////////////////////////////////////////////
 static uint8_t x11time(uint8_t x)
 {
@@ -454,12 +454,12 @@ static uint8_t x11time(uint8_t x)
 
   //Copy value
   int   y = x;
-  
+
   //Do multiplcation by 2, 2 times
   y = x2time(y);
   y = x2time(y);
 
-  //XOR with original value 
+  //XOR with original value
   y = y ^ x;
 
   //Multiply by 2 again
@@ -472,11 +472,11 @@ static uint8_t x11time(uint8_t x)
 }
 
 /////////////////////////////////////////////////////////////////////
-/// used for mixColumns and mixColumnsInv multiplcation by thirteen 
-/// 
-/// @param[in]  x           byte to be modified    
-/// 
-/// @return     uint8_t     modified result of operations to x  
+/// used for mixColumns and mixColumnsInv multiplcation by thirteen
+///
+/// @param[in]  x           byte to be modified
+///
+/// @return     uint8_t     modified result of operations to x
 /////////////////////////////////////////////////////////////////////
 static uint8_t x13time(uint8_t x)
 {
@@ -505,11 +505,11 @@ static uint8_t x13time(uint8_t x)
 
 
 /////////////////////////////////////////////////////////////////////
-/// used for mixColumns and mixColumnsInv multiplcation by fourteen 
-/// 
-/// @param[in]  x           byte to be modified    
-/// 
-/// @return     uint8_t     modified result of operations to x  
+/// used for mixColumns and mixColumnsInv multiplcation by fourteen
+///
+/// @param[in]  x           byte to be modified
+///
+/// @return     uint8_t     modified result of operations to x
 /////////////////////////////////////////////////////////////////////
 static uint8_t x14time(uint8_t x)
 {
@@ -539,12 +539,12 @@ static uint8_t x14time(uint8_t x)
 }
 
 /////////////////////////////////////////////////////////////////////
-/// Implements addRoundKey Step 
-/// 
-/// @param[in]      RoundKey    Key to modify message 
-/// @param[in/out]  state_t     16 byte message to by decrpyted    
-/// 
-/// NOTE: This function is the same as the encryption since it only 
+/// Implements addRoundKey Step
+///
+/// @param[in]      RoundKey    Key to modify message
+/// @param[in/out]  state_t     16 byte message to by decrpyted
+///
+/// NOTE: This function is the same as the encryption since it only
 ///       involves the XOR operation
 /////////////////////////////////////////////////////////////////////
 void addRoundKeyInv(uint8_t state_t[4][4], uint8_t RoundKey[4][4])
@@ -573,11 +573,11 @@ void addRoundKeyInv(uint8_t state_t[4][4], uint8_t RoundKey[4][4])
 
 
 /////////////////////////////////////////////////////////////////////
-/// Generates next round key 
-/// 
+/// Generates next round key
+///
 /// @param[in]  RoundKey    Last Round Key
-/// @param[in]  roundNum    round number of operation  
-/// @param[out] newKey      Next Round Key 
+/// @param[in]  roundNum    round number of operation
+/// @param[out] newKey      Next Round Key
 ///
 /////////////////////////////////////////////////////////////////////
 void nextKey( uint8_t currentKey[4][4], uint8_t newKey[4][4], int roundNum)
@@ -585,7 +585,7 @@ void nextKey( uint8_t currentKey[4][4], uint8_t newKey[4][4], int roundNum)
   unsigned i, j, k;
   uint8_t temp[4]; // Used for the column/row operations
 
-   
+
   //rotWord () -> shifts all elements up one location
   temp[0] = currentKey[1][3];
   temp[1] = currentKey[2][3];
@@ -606,28 +606,28 @@ void nextKey( uint8_t currentKey[4][4], uint8_t newKey[4][4], int roundNum)
 
   //Generate newKey
   for(i = 0; i < 4; i++) {
-  
+
     //XOR with element in previous key
     newKey[i][0]  = temp[i] ^ currentKey[i][0];
     newKey[i][1]  = newKey[i][0] ^ currentKey[i][1];
     newKey[i][2]  = newKey[i][1] ^ currentKey[i][2];
     newKey[i][3]  = newKey[i][2] ^ currentKey[i][3];
-  
+
   }
 
   return;
 }
 
 /////////////////////////////////////////////////////////////////////
-/// Generates next inital key 
-/// 
+/// Generates next inital key
+///
 /// @param[in]  initalizer  name for key use
-/// @param[out] newKey      inital Key 
+/// @param[out] newKey      inital Key
 ///
 /////////////////////////////////////////////////////////////////////
 void initalKey( char *initalizer, uint8_t newKey[4][4])
 {
-  int       length; 
+  int       length;
   uint8_t   initKey[16];
 
   int       i, j;
@@ -635,21 +635,21 @@ void initalKey( char *initalizer, uint8_t newKey[4][4])
   //Determine the length of the initalizer
   length = strlen( initalizer );
 
-  //For the first 16 elements or the entire initalizer 
+  //For the first 16 elements or the entire initalizer
   for(i = 0; i < 16 && i < length; i++) {
 
     //Copy each element into initKey
     initKey[i] = initalizer[i] & 0xff;
   }
 
-  //If the key is not full 
+  //If the key is not full
   if(16 > i) {
 
     //Until the initKey if full
     for( ; i < 16; i++) {
 
       //Enter in preset elements
-      initKey[i] = defaultKey_gv[i] & 0xff; 
+      initKey[i] = defaultKey_gv[i] & 0xff;
     }
   }
 
@@ -666,14 +666,14 @@ void initalKey( char *initalizer, uint8_t newKey[4][4])
 
 /////////////////////////////////////////////////////////////////////
 /// Generates inital password in plaintext
-/// 
+///
 /// @param[out]   state_t    inital state of Password
-/// @param[in]   password   plaintest Password 
+/// @param[in]   password   plaintest Password
 ///
 /////////////////////////////////////////////////////////////////////
 void setState(uint8_t state_t[4][4], char password[17])
 {
-  int       length; 
+  int       length;
   uint8_t   initState[16];
 
   int       i, j;
@@ -681,7 +681,7 @@ void setState(uint8_t state_t[4][4], char password[17])
   //Determine the length of the initalizer
   length = strlen( password );
 
-  //For the first 16 elements or the entire initalizer 
+  //For the first 16 elements or the entire initalizer
   for(i = 0; i < 16 && i < length; i++) {
 
     //Copy each element into initKey
@@ -689,14 +689,14 @@ void setState(uint8_t state_t[4][4], char password[17])
   }
 
 
-  //If the key is not full 
+  //If the key is not full
   if(16 > i) {
 
     //Until the initKey if full
     for( ; i < 16; i++) {
 
       //Enter in preset elements
-      initState[i] = 0x00; 
+      initState[i] = 0x00;
     }
   }
 
@@ -712,17 +712,17 @@ void setState(uint8_t state_t[4][4], char password[17])
 
 /////////////////////////////////////////////////////////////////////
 /// Generates state matrix from encrypted password
-/// 
+///
 /// @param[out]   state_t    inital state of Password
-/// @param[in]    password   plaintest Password 
+/// @param[in]    password   plaintest Password
 ///
 /////////////////////////////////////////////////////////////////////
 void resetState(uint8_t state_t[4][4], char password[17])
 {
 
-  int i; 
+  int i;
 
-  //For the first 16 elements or the entire initalizer 
+  //For the first 16 elements or the entire initalizer
   for(i = 0; i < 16 ; i++) {
 
     //Copy each element into initKey
@@ -734,10 +734,10 @@ void resetState(uint8_t state_t[4][4], char password[17])
 }
 
 /////////////////////////////////////////////////////////////////////
-/// main function to encrypt the password 
-/// 
+/// main function to encrypt the password
+///
 /// @param[in/out]  password    inital and encrptyed password
-/// @param[int]     ID          character array to id password 
+/// @param[int]     ID          character array to id password
 ///
 /////////////////////////////////////////////////////////////////////
 void printProgress(uint8_t state_t[4][4])
@@ -759,9 +759,9 @@ void printProgress(uint8_t state_t[4][4])
 
 /////////////////////////////////////////////////////////////////////
 /// Creates new char array from state matrix
-/// 
+///
 /// @param[out]  password    to be encrptyed password
-/// @param[int]     ID          character array to id password 
+/// @param[int]     ID          character array to id password
 ///
 /////////////////////////////////////////////////////////////////////
 void new_password (char password[17], uint8_t state_t[4][4])
@@ -774,56 +774,56 @@ void new_password (char password[17], uint8_t state_t[4][4])
 
     for (j = 0; j < 4; j++)
     {
-   
+
       password[index] = state_t[i][j] & 0xff;
       index++;
     }
   }
-  
-  //Add null terminator 
+
+  //Add null terminator
   password[16] = '\0';
 
 }
 
 
 /////////////////////////////////////////////////////////////////////
-/// main function to encrypt the password 
-/// 
+/// main function to encrypt the password
+///
 /// @param[in/out]  password    inital and encrptyed password
-/// @param[int]     ID          character array to id password 
+/// @param[int]     ID          character array to id password
 /// @param[out]     state_t     state matrix for password
 ///
 /////////////////////////////////////////////////////////////////////
 void encrpyt(char password[16], char *ID, uint8_t state_t[4][4])
 {
 
-    //Steps for encrption 
+    //Steps for encrption
     /*
      * addRoundKey -> 1 time
-     * 
+     *
      * Repeat 9 times
      *  -   subBytes
      *  -   shiftRows
      *  -   mixColumns
      *  -   addRoundKey
-     * 
+     *
      * subBytes
      * shiftRows
      * addRoundKey
-     * 
+     *
      */
 
-    
+
     int       i, j, k;
     int       roundNum = 0;
 
     uint8_t   currentKey[11][4][4]; //Need 11 keys
 
     //Set password into state
-    setState(state_t, password); 
+    setState(state_t, password);
 
     //cout << "Original Password: \n";
-    //printProgress(state_t);  
+    //printProgress(state_t);
 
     //Get inital key from key ID
     initalKey(ID, currentKey[0]);
@@ -846,7 +846,7 @@ void encrpyt(char password[16], char *ID, uint8_t state_t[4][4])
       subBytes(state_t);
       shiftRows(state_t);
       mixColumns(state_t);
-      addRoundKey(state_t, currentKey[i]);    
+      addRoundKey(state_t, currentKey[i]);
 
       //get next round key
       nextKey(currentKey[i], currentKey[i+1], roundNum);
@@ -854,7 +854,7 @@ void encrpyt(char password[16], char *ID, uint8_t state_t[4][4])
       //incremenet the round number
       roundNum++;
     }
-    
+
 
     //Final Round
     subBytes(state_t);
@@ -870,33 +870,32 @@ void encrpyt(char password[16], char *ID, uint8_t state_t[4][4])
 
 
 /////////////////////////////////////////////////////////////////////
-/// main function to decrypt the password 
-/// 
-/// @param[out]     password    inital and encrptyed password
-/// @param[in]      ID          character array to id password 
+/// main function to decrypt the password
+///
+/// @param[in]      ID          character array to id password
 /// @param[in/out]  state_t     state matrix for password
 ///
 /////////////////////////////////////////////////////////////////////
-void decrpyt(char password[16], char *ID, uint8_t state_t[4][4])
+void decrpyt( char *ID, uint8_t state_t[4][4])
 {
 
-  //Steps for encrption 
+  //Steps for encrption
     /*
      * addRoundKey -> 1 time
-     * 
+     *
      * Repeat 9 times
      *  -   shiftRowsInv
      *  -   subBytesInv
      *  -   addRoundKeyInv
      *  -   mixColumnsInv
-     * 
+     *
      * shiftRowsInv
      * subBytesInv
      * addRoundKey
-     * 
+     *
      */
 
-  
+
   int       i, j, k;
   int       roundNum = 0;
 
@@ -905,14 +904,14 @@ void decrpyt(char password[16], char *ID, uint8_t state_t[4][4])
   //Determine all of the keys to use
   initalKey(ID, currentKey[0]);
 
-  //Find each of the keys 
+  //Find each of the keys
   for(i = 1; i < 11; i++) {
 
     //Get next key
     nextKey(currentKey[i-1], currentKey[i], i);
   }
 
-  //Add round key 
+  //Add round key
   addRoundKey(state_t, currentKey[10]);
 
   //For 10 rounds
@@ -937,7 +936,7 @@ void decrpyt(char password[16], char *ID, uint8_t state_t[4][4])
 }
 
 /*
-int main() 
+int main()
 {
     char type[50];
     char password[16];
@@ -945,9 +944,9 @@ int main()
     uint8_t   state_t[4][4];
 
     cout << "Enter a password Name to generate: ";
-    cin >> type; 
+    cin >> type;
 
-    cout << endl << "Enter the password to encrypt: "; 
+    cout << endl << "Enter the password to encrypt: ";
     cin >> password;
 
 

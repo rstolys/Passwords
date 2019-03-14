@@ -13,35 +13,47 @@ using namespace std;
 #define DELETE_PASSWORD   3
 #define EXIT              4
 
-class order;
+typedef struct
+{
+  string    sName;
+  string    sPassword;
+} Password_t;
 
-void add_pass();
-void look_up(); 
-void delete_pass();
+/////////////////////////////////////////////////////////////////////
+/// adds password to data structure
+///
+/// @param[out]     *pList       Passwords data strcuture
+/// @param[in/out]  *piNumPass   Number of passwords saved
+///
+/////////////////////////////////////////////////////////////////////
+void add_pass( password_t *pList, int *piNumPass );
 
-void generate(string word);
-void show_pass(string word);
-void print_file();
-void sort(order* pass, int n);
-void swap(order* a, order* b);
+/////////////////////////////////////////////////////////////////////
+/// Looks up and displays password for user
+///
+/// @param[out]     *pList       Passwords data strcuture
+/// @param[in]      iNumPass   Number of passwords saved
+///
+/////////////////////////////////////////////////////////////////////
+void look_up( password_t *pList, int iNumPass );
 
-class order {
-public:
-    order() {}
+/////////////////////////////////////////////////////////////////////
+/// Deletes password from data strcuture
+///
+/// @param[out]     *pList       Passwords data strcuture
+/// @param[in/out]  *piNumPass   Number of passwords saved
+///
+/////////////////////////////////////////////////////////////////////
+void delete_pass( password_t *pList, int *piNumPass );
 
-    void setup(string word);
-    void set_int();
-    int value ();
-    string show();
-
-private:
-    int     letter;
-    string  program;
-};
+/////////////////////////////////////////////////////////////////////
+/// Displays passwords in data structure
+///
+/// @param[in]     *pList       Passwords data strcuture
+///
+/////////////////////////////////////////////////////////////////////
+void show_passwords( password_t *pList );
 
 
 
-
-
-
-#endif 
+#endif

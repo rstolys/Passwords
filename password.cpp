@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <cstdio>
+#include <cstring>
 
 #include "password.hpp"
 #include "AESencryption.hpp"
@@ -10,308 +11,274 @@
 using namespace std;
 
 
+/////////////////////////////////////////////////////////////////////
+/// adds password to data structure
+///
+/// @param[out]     *pList       Passwords data strcuture
+/// @param[in/out]  *piNumPass   Number of passwords saved
+///
+/////////////////////////////////////////////////////////////////////
+void add_pass( password_t *pList, int *piNumPass ) {
 
-//Order class functions
-void order::setup(string word) {
+    string        sType;
+    string        sEncrypt;
 
-        program = word; 
-        set_int();
-}
+    int           i;
 
-void order::set_int() {
-    
-    int first = (int) program[0];
+    uint8_t       state[4][4];
 
-    if (first >= 65 && first <= 90) {
+    //verify we won't go over password bounds
+    if( 49 < *piNumPass )
+    {
 
-        //Change capital letters to lowercase for sorting
-        first += 32;        
+      cout << "The password limit has been reached\n";
+      return;
     }
 
-    //Set index of word; 
-    letter = first;    
-}
-
-int order::value () {
-    return letter;
-}
-
-string order::show() {
-    return program;
-}
-
-
-void add_pass() { 
-
-    char type[50];
-    char to_encrypt[16];
-
-    uint8_t   state_t[4][4];
-
+    //Get name of password
     cout << "Enter a password Name to generate: ";
-    cin >> type; 
+    cin >> sType;
 
 
-    //Check if password alredy exists 
+    ////////////////////////////////////
+    /// Check if password alredy exists
+    ////////////////////////////////////
 
+    for ( i = 0; i < *piNumPass; i++ )
+    {
 
-    cout << endl << "Enter the password to encrypt: "; 
-    cin >> to_encrypt;
+      //If password already exists, return
+      if( sType == pList[i].sName )
+      {
 
-
-    //Encrypt password and save in file 
-    encrpyt(to_encrypt, type, state_t);
-
-    //Print to file 
-        //in format that we can extract the state again
-
-    // File format 
-    // type:password (in hex seperated by spaces)
-}
-
-
-void add_pass2() { 
-
-    string program;
-    string line; 
-    ofstream file;
-    ifstream read; 
-    bool exists = false;
-
-
-    cout << "Enter Program: "; 
-    cin >> program;
-
-
-    read.open("ryan_pass.txt");
-    file.open("ryan_pass.txt", ios_base::app); 
-
-     if(!(read.good())) {
-        cout << "File could not be opened\n";
-        cout << "Program Terminating\n";
-        exit(-1);
-    }
-
-    if(!(file.good())) {
-        cout << "File could not be opened\n";
-        cout << "Program Terminating\n";
-        exit(-1);
-    }
-
-    while (getline(read, line)) {
-
-        if(line == program) {
-            cout << "This Password already exists in the file \n";
-            exists = true;
-            break;
-        }
-        else if (line != program) {
-            continue; 
-        }
-    }
-
-    if (!exists) {
-        file << program << endl;
-    }
-
-
-    show_pass(program);
-
-    file.close(); 
-    return;
-}
-
-
-
-void look_up() {
-    string program;
-
-    cout << "Here is a list of all the programs with passwords: \n";
-    print_file(); 
-
-    cout << "Enter the password you want to look up: ";
-    cin >> program; 
-
-    show_pass(program);
-    return;
-}
-
-void delete_pass() {
-    ifstream file;
-    ifstream temp_i;
-    ofstream temp;
-    ofstream output;  
-    file.open("ryan_pass.txt");
-    temp.open("temp.txt");
-    string line;
-    string word;
-
-    cout << "Enter Program to Delete: "; 
-    cin >> word;
-
-    if(!(file.good())) {
-        cout << "File could not be opened\n";
-        cout << "Program Terminating\n";
-        exit(-1);
-    }
-
-    if(!(temp.good())) {
-        cout << "File could not be opened\n";
-        cout << "Program Terminating\n";
-        exit(-1);
-    }
-
-    while (!file.eof()) {
-        getline(file, line);
-
-        if (line == word) {
-            continue;
-        } 
-        else {
-            temp << line << endl;
-        }
-    }
-
-    remove("ryan_pass.txt");
-    temp.close();
-
-    temp_i.open("temp.txt");
-    output.open("ryan_pass.txt");
-    if(!(temp_i.good())) {
-        cout << "File could not be opened\n";
-        cout << "Program Terminating\n";
-        exit(-1);
-    }
-    if(!(output.good())) {
-        cout << "File could not be opened\n";
-        cout << "Program Terminating\n";
-        exit(-1);
-    }
-
-    while(!temp_i.eof()) {
-        getline(temp_i, line);
-        output << line << endl;
-    }
-
-    remove("temp.txt");
-    output.close(); 
-    return;
-}
-
-void generate(string word) {
-    int location_s; 
-    int location_C;
-    int special_chars = 14;         //Number of special characters in ASCII
-    int capital = 26;               //Number of capital letters
-    int char_i;                     //Character to use
-    int* result_i = new int[10];
-    int* result_f = new int[10]; 
-    int length = word.length(); 
-
-
-    //Set specific Passwords for other accounts
-    //Example
-    /*
-    if(word == "bell") {
-        cout << "5646\n";
+        cout << "\n\tThis password already exists\n";
         return;
+      }
     }
-    */    
-     
-    location_s = special_chars % length;        //location where special character will be placed
- 
-    location_C = capital % length;        //location where capital letter will be placed
 
-    for (int i = 0; i < length && i < 10; i++) {
-        if (i == location_s) {                              //Insert Special Character
-            char_i =  (location_s % special_chars) + 33;
-            cout << (char)char_i;
-        }
+    //Get password to encrypt
+    cout << endl << "Enter the password to encrypt: ";
+    cin >> sEncrypt;
 
-        if (i == location_C) {                              //Insert Capital Letter
-            char_i =  (location_C % capital) + 65;
-            cout << (char)char_i;
-        }
-        cout << hex <<(int)word[i]; 
+
+    //Encrypt password and save in file
+    encrpyt(sEncrypt.c_str(), sType.c_str(), state);
+
+
+    //Find first open location for password to be stored
+    for( i = 0; i < *piNumPass; i++ )
+    {
+
+      if( !pList[i].sName.length() )
+      {
+
+         //Use this index
+         break;
+      }
     }
-    cout << "\n";
-}
 
-void show_pass(string word) {
-    cout << "The password for " << word << " is: \n"; 
-    generate(word); 
-    cout << "\n";
+    //Save type to data structure
+    pList[ i ].sName = sType;
+
+    //Save encrypted password to data strcuture
+    for( i = 0; i < 16; i++ )
+    {
+
+      //Add element to string
+      pList[ i ].sPassword += state[ i / 4 ][ i % 4 ];
+    }
+
+    //Increment number of passwords
+    (*piNumPass)++;
+
     return;
 }
 
-void print_file() {
-    //Open file
-    ifstream file; 
-    file.open("ryan_pass.txt"); 
-    string program;
-    string dummy;
-    int lines = 0;
-    order* pass; 
+/////////////////////////////////////////////////////////////////////
+/// Looks up and displays password for user
+///
+/// @param[out]     *pList       Passwords data strcuture
+/// @param[in]      iNumPass   Number of passwords saved
+///
+/////////////////////////////////////////////////////////////////////
+void look_up( password_t *pList, int iNumPass ) {
 
-    if(!(file.good())) {
-        cout << "File could not be opened\n";
-        cout << "Program Terminating\n";
-        exit(-1);
-    }
+    int       i, j;
+    string    sName;
 
-    while (!file.eof()) {
-        getline(file, dummy);
-        if (dummy == "") {
-            continue;
+    string    sDecrypted;
+
+    bool      bExit = false;
+
+    uint8_t   state[4][4];
+
+
+    //Show passwords
+    show_passwords( pList );
+
+
+    while( !bExit )
+    {
+
+      cout << "Enter the password you want to look up: ";
+      cin >> sName;
+
+      //Find password and show
+      for ( i = 0; i < iNumPass; i++ )
+      {
+
+        if ( sName == pList[i].sName )
+        {
+
+          //Create state to decrypt
+          for( j = 0; j < 16; j++ )
+          {
+
+            state[ j / 4 ][ j % 4 ] = pList[i].sPassword[j] & 0xff;
+          }
+
+          //Decrypt password
+          decrpyt(pList[i].sName.c_str(), state);
+
+          //Save decrypted password
+          for( i = 0; i < 16; i++ )
+          {
+
+            //Add element to string
+            sDecrypted += state[ i / 4 ][ i % 4 ];
+          }
+
+          //Show password
+          cout << "Password for : " << sName << " : " << sDecrypted << endl;
+
+          //Ensure exit from fucntion is made
+          i--;
+          break;
         }
-        lines++;
+      }
+
+      //if password was not found
+      if ( i == iNumPass )
+      {
+
+          //Password no found
+          cout << "That entry did not match one of the options\n";
+          cout << "Try Again\n\n";
+      }
+      else
+      {
+
+        //Exit entry
+        bExit = true;
+      }
     }
 
-    pass = new order[lines];
-
-    file.close();                           //close and reopen file to read it
-    file.open("ryan_pass.txt");
-    if(!(file.good())) {
-        cout << "File could not be opened\n";
-        cout << "Program Terminating\n";
-        exit(-1);
-    }
-
-    for (int i = 0; i < lines; i++) {
-        file >> program;
-        pass[i].setup(program);
-
-        if(file.eof()){                     //Should not execute since it is a while loop
-            break;
-        }
-    }
-
-    sort(pass, lines); 
-    for (int i = 0; i < lines; i++) {
-        cout << pass[i].show();
-        cout << endl;
-    }
-
-    delete[] pass;
-
-    file.close(); 
     return;
 }
 
-void sort(order* pass, int n) { 
-   int i, j; 
-   for (i = 0; i < n-1; i++) {
-       // Last i elements are already in place    
-       for (j = 0; j < n-i-1; j++)  {
-            if (pass[j].value() > pass[j+1].value()) {
-                swap(&pass[j], &pass[j+1]);  
-            }     
-       }   
-   }      
+/////////////////////////////////////////////////////////////////////
+/// Deletes password from data strcuture
+///
+/// @param[out]     *pList       Passwords data strcuture
+/// @param[in/out]  *piNumPass   Number of passwords saved
+///
+/////////////////////////////////////////////////////////////////////
+void delete_pass( password_t *pList, int *piNumPass ) {
+
+  int       i;
+  int       iPrinted = 0;
+  string    sName;
+
+  bool      bExit = false;
+
+
+  //Show passwords
+  show_passwords( pList );
+
+
+  while( !bExit )
+  {
+
+    cout << "Enter the password you want to delete: ";
+    cin >> sName;
+
+    //Find password and show
+    for ( i = 0; i < iNumPass; i++ )
+    {
+
+      if ( sName == pList[i].sName )
+      {
+
+        //Show password
+        cout << "Password for : " << sName << " : " << pList[i].sPassword << " has been deleted" << endl;
+
+        pList[i].sName = "";
+        pList[i].sPassword = "";
+
+        //Ensure exit from fucntion is made
+        i--;
+        break;
+      }
+    }
+
+    if ( i == iNumPass )
+    {
+
+        //Password no found
+        cout << "That entry did not match one of the options\n";
+        cout << "Try Again\n\n";
+    }
+    else
+    {
+
+      //Decrement number of Passwords
+      (*piNumPass)--;
+
+      //Exit entry
+      bExit = true;
+    }
+  }
+
+
+  return;
 }
 
-void swap(order* a, order* b) {
-    order* temp = a; 
-    a = b; 
-    b = temp; 
+/////////////////////////////////////////////////////////////////////
+/// Displays passwords in data structure
+///
+/// @param[in]     *pList       Passwords data strcuture
+///
+/////////////////////////////////////////////////////////////////////
+void show_passwords( password_t *pList ) {
+
+  int    iPrinted = 0;
+  int    i;
+
+  //Show all passwords
+  cout << "\t\tHere is a list of all the password names: \n\n";
+
+  for ( i = 0; i < iNumPass; i++ )
+  {
+
+    if( !pList[i].sName.length() )
+    {
+
+      //No password saved
+      continue;
+    }
+
+    cout << pList[i].sName << "\t";
+
+    //Increment the number of printed passwords
+    iPrinted++;
+
+    //Every 5 passwords go to next line
+    if( 4 < iPrinted )
+    {
+
+      cout << endl;
+    }
+  }
+
+  return;
 }
