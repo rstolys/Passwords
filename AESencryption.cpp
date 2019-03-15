@@ -65,27 +65,6 @@ static const uint8_t defaultKey_gv[16] =
   0x16, 0xa6, 0x88, 0x3c };
 
 
-//Functions to Generation encrpytion
-void subBytes(uint8_t state_t[4][4]);
-void shiftRows(uint8_t state_t[4][4]);
-void mixColumns(uint8_t state_t[4][4]);
-void addRoundKey(uint8_t state_t[4][4], uint8_t RoundKey[4][4]);
-
-
-//Functions for deencrpytion
-void subBytesInv(uint8_t state_t[4][4]);
-void shiftRowsInv(uint8_t state_t[4][4]);
-void mixColumnsInv(uint8_t state_t[4][4]);
-void addRoundKeyInv(uint8_t state_t[4][4], uint8_t RoundKey[4][4]);
-
-
-//Functions to generate round Keys
-uint8_t nextKey(uint8_t RoundKey[4][4]);
-void initalKey( char *initalizer, uint8_t newKey[4][4]);
-
-//Main functions
-void encrpyt(char password[16], char *ID);
-
 
 /////////////////////////////////////////////////////////////////////
 ///
@@ -671,7 +650,7 @@ void initalKey( char *initalizer, uint8_t newKey[4][4])
 /// @param[in]   password   plaintest Password
 ///
 /////////////////////////////////////////////////////////////////////
-void setState(uint8_t state_t[4][4], char password[17])
+void setState(uint8_t state_t[4][4], char password[16])
 {
   int       length;
   uint8_t   initState[16];
@@ -717,7 +696,7 @@ void setState(uint8_t state_t[4][4], char password[17])
 /// @param[in]    password   plaintest Password
 ///
 /////////////////////////////////////////////////////////////////////
-void resetState(uint8_t state_t[4][4], char password[17])
+void resetState(uint8_t state_t[4][4], const char password[16])
 {
 
   int i;
@@ -733,7 +712,7 @@ void resetState(uint8_t state_t[4][4], char password[17])
   return;
 }
 
-/////////////////////////////////////////////////////////////////////
+///////////////////////////--UNUSED--////////////////////////////////
 /// main function to encrypt the password
 ///
 /// @param[in/out]  password    inital and encrptyed password
@@ -757,7 +736,7 @@ void printProgress(uint8_t state_t[4][4])
 }
 
 
-/////////////////////////////////////////////////////////////////////
+///////////////////////////--UNUSED--/////////////////////////////////
 /// Creates new char array from state matrix
 ///
 /// @param[out]  password    to be encrptyed password
@@ -862,8 +841,8 @@ void encrpyt(char password[16], char *ID, uint8_t state_t[4][4])
     addRoundKey(state_t, currentKey[i]);
 
 
-    //cout << "\nThe new password is: \n";
-    //printProgress(state_t);
+    // cout << "\nThe new password is: \n";
+    // printProgress(state_t);
 
     return;
 }
@@ -929,8 +908,8 @@ void decrpyt( char *ID, uint8_t state_t[4][4])
   addRoundKeyInv(state_t, currentKey[0]);
 
 
-  //cout << "\nThe password was: \n";
-  //printProgress(state_t);
+  // cout << "\nThe password was: \n";
+  // printProgress(state_t);
 
   return;
 }
@@ -955,7 +934,7 @@ int main()
     encrpyt(password, type, state_t);
 
     //Encrypt the password
-    decrpyt(password, type, state_t);
+    decrpyt(type, state_t);
 
     return 0;
 }

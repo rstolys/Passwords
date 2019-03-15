@@ -2,7 +2,7 @@
 #include <fstream>
 #include <string>
 #include <cstdio>
-#include <cstring>
+#include <string.h>
 
 #include "password.hpp"
 #include "AESencryption.hpp"
@@ -21,9 +21,14 @@ using namespace std;
 void add_pass( password_t *pList, int *piNumPass ) {
 
     string        sType;
-    string        sEncrypt;
+    char          szID[25];
 
-    int           i;
+    string        sEncrypt;
+    char          szEncrypt[16];
+
+    char          szPassword[16];
+
+    int           i, j;
 
     uint8_t       state[4][4];
 
@@ -60,10 +65,14 @@ void add_pass( password_t *pList, int *piNumPass ) {
     cout << endl << "Enter the password to encrypt: ";
     cin >> sEncrypt;
 
+    //Create char* for ID
+    strcpy( szID, sType.c_str() );
+
+    //Create char* for password to encrypt
+    strcpy( szEncrypt, sEncrypt.c_str() );
 
     //Encrypt password and save in file
-    encrpyt(sEncrypt.c_str(), sType.c_str(), state);
-
+    encrpyt( szEncrypt, szID, state);
 
     //Find first open location for password to be stored
     for( i = 0; i < *piNumPass; i++ )
@@ -81,12 +90,15 @@ void add_pass( password_t *pList, int *piNumPass ) {
     pList[ i ].sName = sType;
 
     //Save encrypted password to data strcuture
-    for( i = 0; i < 16; i++ )
+    for( j = 0; j < 16; j++ )
     {
 
       //Add element to string
-      pList[ i ].sPassword += state[ i / 4 ][ i % 4 ];
+      sprintf( &szPassword[j],  "%c", state[ j / 4 ][ j % 4 ] );
     }
+    
+    //Save password
+    pList[i].sPassword = szPassword;
 
     //Increment number of passwords
     (*piNumPass)++;
@@ -105,16 +117,17 @@ void look_up( password_t *pList, int iNumPass ) {
 
     int       i, j;
     string    sName;
+    char      szID[25];
 
     string    sDecrypted;
-
+    
     bool      bExit = false;
 
     uint8_t   state[4][4];
 
 
     //Show passwords
-    show_passwords( pList );
+    show_passwords( pList, iNumPass);
 
 
     while( !bExit )
@@ -131,14 +144,13 @@ void look_up( password_t *pList, int iNumPass ) {
         {
 
           //Create state to decrypt
-          for( j = 0; j < 16; j++ )
-          {
+          createState( pList[i].sPassword, state );   //seg fault*****************
 
-            state[ j / 4 ][ j % 4 ] = pList[i].sPassword[j] & 0xff;
-          }
+          //Create char* for ID
+          strcpy( szID, pList[i].sName.c_str() );
 
           //Decrypt password
-          decrpyt(pList[i].sName.c_str(), state);
+          decrpyt( szID, state);
 
           //Save decrypted password
           for( i = 0; i < 16; i++ )
@@ -149,7 +161,7 @@ void look_up( password_t *pList, int iNumPass ) {
           }
 
           //Show password
-          cout << "Password for : " << sName << " : " << sDecrypted << endl;
+          cout << "\nPassword for : " << sName << " : " << sDecrypted << endl;
 
           //Ensure exit from fucntion is made
           i--;
@@ -177,6 +189,45 @@ void look_up( password_t *pList, int iNumPass ) {
 }
 
 /////////////////////////////////////////////////////////////////////
+/// Creates new state from password
+///
+/// @param[in]    sPassword    Password to set state with
+/// @param[out]   state        state to decrypt
+///
+/////////////////////////////////////////////////////////////////////
+void createState( string sPassword, uint8_t state[4][4] )
+{
+
+  char    szPassword[16]; 
+  char    *szToken;
+
+  //Copy password into char *
+  strcpy( szPassword, sPassword.c_str() );
+
+  //Get first token of password 
+  szToken = strtok( szPassword, " " ); 
+
+  //Save into state 
+  state[0][0] = szToken[0] & 0xff;
+
+  //Loop for rest of password
+  for (int i = 1; i < 16; i++)
+  {
+
+    //Get token 
+    szToken = strtok( NULL, " " );
+
+    //Save into state 
+    state[ i / 4 ][ i % 4 ] = szToken[0] & 0xff;
+
+  }
+
+  cout << "Password: \n";
+  printProgress(state);
+
+}
+
+/////////////////////////////////////////////////////////////////////
 /// Deletes password from data strcuture
 ///
 /// @param[out]     *pList       Passwords data strcuture
@@ -193,7 +244,7 @@ void delete_pass( password_t *pList, int *piNumPass ) {
 
 
   //Show passwords
-  show_passwords( pList );
+  show_passwords( pList, *piNumPass );
 
 
   while( !bExit )
@@ -203,7 +254,7 @@ void delete_pass( password_t *pList, int *piNumPass ) {
     cin >> sName;
 
     //Find password and show
-    for ( i = 0; i < iNumPass; i++ )
+    for ( i = 0; i < *piNumPass; i++ )
     {
 
       if ( sName == pList[i].sName )
@@ -221,7 +272,7 @@ void delete_pass( password_t *pList, int *piNumPass ) {
       }
     }
 
-    if ( i == iNumPass )
+    if ( i == *piNumPass )
     {
 
         //Password no found
@@ -247,9 +298,10 @@ void delete_pass( password_t *pList, int *piNumPass ) {
 /// Displays passwords in data structure
 ///
 /// @param[in]     *pList       Passwords data strcuture
+/// @param[in]     iNumPass     Number of passwords
 ///
 /////////////////////////////////////////////////////////////////////
-void show_passwords( password_t *pList ) {
+void show_passwords( password_t *pList, int iNumPass ) {
 
   int    iPrinted = 0;
   int    i;
@@ -279,6 +331,8 @@ void show_passwords( password_t *pList ) {
       cout << endl;
     }
   }
+
+  cout << endl << endl;
 
   return;
 }

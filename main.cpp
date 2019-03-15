@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
-#include <cstring>
+#include <string.h>
 
 #include "password.hpp"
 #include "AESencryption.hpp"
@@ -30,6 +30,9 @@ bool authentification() {
 
         //If guess is correct
         if (guess == master_pass) {         //Must be perfect match
+
+            //Display successful authentification
+            cout << "\n\nAuthentification Successful\n\n";
 
             //Permit access
             return true;
@@ -59,7 +62,7 @@ bool authentification() {
 /// @param[in/out]   *piNumPass   Number of passwords saved
 ///
 /////////////////////////////////////////////////////////////////////
-void menu( passwowrd_t *pList, int *piNumPass ) {
+void menu( password_t *pList, int *piNumPass ) {
 
     int     iChoice;
     bool    bContinue = true;
@@ -68,7 +71,7 @@ void menu( passwowrd_t *pList, int *piNumPass ) {
     while ( bContinue ) {
 
         //Display menu options
-        cout << "Options: \n";
+        cout << "\nOptions: \n";
         cout << "\t 1. Add Password\n";
         cout << "\t 2. Look Up Password\n";
         cout << "\t 3. Delete Password\n";
@@ -128,11 +131,11 @@ void menu( passwowrd_t *pList, int *piNumPass ) {
 /// @param[in/out]   *piNumPass   Number of passwords saved
 ///
 /////////////////////////////////////////////////////////////////////
-void write_passwords( passwowrd_t *pList, string filename, int iNumPass )
+void write_passwords( password_t *pList, string filename, int iNumPass )
 {
   ofstream    ofWrite;
 
-  int         iNumPass = 0;
+  int         i, j;
 
   //Open file for writing
   ofWrite.open( filename );
@@ -142,7 +145,7 @@ void write_passwords( passwowrd_t *pList, string filename, int iNumPass )
   {
 
     //If password element is empty
-    if ( !pList[iNumPass].sName.length() )
+    if ( !(pList[i].sName.length()) )
     {
 
       //Skip write
@@ -150,11 +153,19 @@ void write_passwords( passwowrd_t *pList, string filename, int iNumPass )
     }
 
     //Write the name to the file
-    ofWrite << pList[iNumPass].sName << ":";
+    ofWrite << pList[i].sName << ":";
 
     //Write the passsword to the file
-    ofWrite << pList[iNumPass].sPassword << endl;
+    for( j = 0; j < 16; j++ )
+    {
 
+      //Add password element by element
+      ofWrite << pList[i].sPassword[j] << " ";
+    }
+
+    //Add endline
+    ofWrite << endl;
+    
     //increment the password
     iNumPass++;
 
@@ -165,6 +176,9 @@ void write_passwords( passwowrd_t *pList, string filename, int iNumPass )
       break;
     }
   }
+
+  //close file 
+  ofWrite.close();
 
   //File is updated
   return;
@@ -178,17 +192,28 @@ void write_passwords( passwowrd_t *pList, string filename, int iNumPass )
 /// @param[in/out]   *piNumPass   Number of passwords saved
 ///
 /////////////////////////////////////////////////////////////////////
-void load_passwords( passwowrd_t *pList, string filename, int *piNumPass )
+void load_passwords( password_t *pList, string filename, int *piNumPass )
 {
 
   ifstream    ifRead;
 
   string      sElement;
-  char        szElement;
-  char        szToken;
+  char        szElement[40];
+  char        *szToken;
 
   //Open file
   ifRead.open( filename );
+
+  //If file did not open
+  if( !( ifRead.good() ) ) 
+  {
+
+    cout << "File did not open\n"; 
+    cout << "File does not exist\n\n";
+
+    //no passwords to load 
+    return;
+  }
 
   while ( !( ifRead.eof() ) )
   {
@@ -205,17 +230,24 @@ void load_passwords( passwowrd_t *pList, string filename, int *piNumPass )
     //Get line from file
     getline( ifRead, sElement );
 
+    //Ensure line isnt empty
+    if( !sElement.length() )
+    {
+
+      //Line is empty, end file load 
+      return;
+    }
+
     //Convert to c string
     strcpy( szElement, sElement.c_str() );
 
-
     //Tokenize name element and save into structure
     szToken = strtok( szElement, ":" );
-    piList[ *piNumPass ].sName = szToken;
+    pList[ *piNumPass ].sName = szToken;
 
     //Tokenize encrytpted password element and save into structure
     szToken = strtok( NULL, ":" );
-    piList[ *piNumPass ].sPassword = szToken;
+    pList[ *piNumPass ].sPassword = szToken;
 
 
     //Increment to net passwords
@@ -224,6 +256,9 @@ void load_passwords( passwowrd_t *pList, string filename, int *piNumPass )
 
   //All passwords loaded
   cout << "\n\tPasswords Loaded\n\n";
+
+  //close file 
+  ifRead.close();
 
   return;
 }
@@ -252,14 +287,14 @@ int main( int argc, char **argv ) {
   if (authentification()) {
 
       //Load all the passwords to data strcuture
-      load_passwords( &pList, argv[1], &iNumPass );
+      load_passwords( pList, argv[1], &iNumPass );
 
       //Call function to handle user inputs
-      menu( &pList, &iNumPass );
+      menu( pList, &iNumPass );
   }
 
     //Write passwords to file beofre exiting
-    write_passwords( &pList, argv[1], iNumPass );
+    write_passwords( pList, argv[1], iNumPass );
 
     return 0;
 }
