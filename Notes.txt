@@ -1,0 +1,8 @@
+Progress:
+
+No Seg Faults
+Setting state does not work correctly resulting in improper encryption and decrytpions
+
+Recommend converting password.cpp to class member functions of the password type 
+
+By Converting to class, will have ability to add more functionality and checking of what passwords exist

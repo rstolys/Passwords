@@ -15,8 +15,8 @@ using namespace std;
 
 typedef struct
 {
-  string    sName;
-  string    sPassword;
+  char      szName[25];
+  char      szPassword[16];
 } password_t;
 
 /////////////////////////////////////////////////////////////////////
@@ -40,11 +40,11 @@ void look_up( password_t *pList, int iNumPass );
 /////////////////////////////////////////////////////////////////////
 /// Creates new state from password
 ///
-/// @param[in]    sPassword    Password to set state with
-/// @param[out]   state        state to decrypt
+/// @param[in]    szPassword    Password to set state with
+/// @param[out]   state         state to decrypt
 ///
 /////////////////////////////////////////////////////////////////////
-void createState( string sPassword, uint8_t state[4][4] );
+void createState( char szPassword[16], uint8_t state[4][4] );
 
 /////////////////////////////////////////////////////////////////////
 /// Deletes password from data strcuture
