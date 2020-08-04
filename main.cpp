@@ -21,7 +21,7 @@ bool authentification()
     {
     bool    rc = false;
 
-    string  master_pass = "SFUnc2019!";     //Master Password
+    string  master_pass = "SFUnc2020!";     //Master Password
     string  guess;                          //Master Password Guess
     int     trys = 1;                       //First attempt is try
 
@@ -35,6 +35,7 @@ bool authentification()
             {
             cout << "\n\nAuthentification Successful\n\n";
             rc = true;
+            break;
             }
         else
             {
@@ -45,6 +46,7 @@ bool authentification()
                 {
                 cout << "Program Terminating...\n";
                 rc = false;
+                break;
                 }
 
             trys++;
@@ -63,7 +65,7 @@ bool authentification()
 /////////////////////////////////////////////////////////////////////
 void menu(passClass *pVault)
 {
-    int iChoice;
+    int  iChoice;
     bool bContinue = true;
 
     //Loop until exit
@@ -137,6 +139,9 @@ void write_passwords(passClass *pVault, string filename)
     FILE    *ofWrite;
     int     iNumPass = pVault->getNumPass();
 
+    char*   szPassword;
+    char*   szName;
+
     int     i, j;
 
     //Open file for writing
@@ -149,18 +154,21 @@ void write_passwords(passClass *pVault, string filename)
     for (i = 0; i < iNumPass; i++)
         {
         //If password element is empty
-        if (0 == pVault->vList[i].szName[0])
+        if (pVault->isListEmpty())
             {
             continue;
             }
 
         //Write the name to the file
-        fprintf(ofWrite, "%s:", pVault->vList[i].szName);
+        fprintf( ofWrite, "%s:", pVault->accessNameElementFromList( i ) );
+
+        //Get password from list
+        szPassword = pVault->accessPasswordElementFromList( i );
 
         //Write the passsword to the file
         for (j = 0; j < 16; j++)
             {
-            fprintf(ofWrite, "%02x ", pVault->vList[i].szPassword[j] & 0xff);
+            fprintf(ofWrite, "%02x ", szPassword[j] & 0xff);
             }
 
         //Add endline
@@ -185,18 +193,21 @@ void write_passwords(passClass *pVault, string filename)
 void load_passwords(passClass *pVault, string filename)
     {
 
-    ifstream ifRead(filename);
-    int iNumLines;
-    string sNumLines;
+    ifstream        ifRead(filename);
+    int             iNumLines;
+    string          sNumLines;
 
-    string sElement[50];
-    char szElement[40];
-    char *szToken;
-    char *szToken2;
+    string          sElement[50];
+    char            szElement[40];
+    char            *szToken;
+    char            *szToken2;
 
-    stringstream ss;
+    char            szNameElement[25];
+    char            szPasswordElement[16];
 
-    int i, j;
+    stringstream    ss;
+
+    int             i, j;
 
     //If file did not open
     if (!(ifRead.good()))
@@ -214,9 +225,10 @@ void load_passwords(passClass *pVault, string filename)
             //Fill string stream
             ss << sNumLines;
 
+            //Make number of lines into an integer
             ss >> iNumLines;
 
-            for (j = 0; j < iNumLines; j++)
+            for ( j = 0; j < iNumLines; j++ )
                 {
 
                 //Get line from file
@@ -226,19 +238,19 @@ void load_passwords(passClass *pVault, string filename)
                 strcpy(szElement, sElement[j].c_str());
 
                 //Tokenize name element and save into structure
-                szToken = strtok(szElement, ":");
-                pVault->vList.push_back(szToken, "temp");
-
+                szToken = strtok( szElement, ":" );
+                strcpy( szNameElement, szToken );
+                
                 //Save each character into each element of password array
-                szToken2 = strtok(NULL, " ");
-                pVault->vList[j].szPassword[0] = szToken2[0];
-
                 //Loop for all other elements
-                for (i = 1; i < 16; i++)
+                for (i = 0; i < 16; i++)
                     {
-                    szToken2 = strtok(NULL, " ");
-                    pVault->vList[j].szPassword[i] = szToken2[0];
+                    szToken = strtok( NULL, " " );
+                    szPasswordElement[i] = szToken[0] & 0xff;
                     }
+
+                //Add element to vector 
+                pVault->addElementToList( szNameElement, szPasswordElement );
                 }
 
             //All passwords loaded

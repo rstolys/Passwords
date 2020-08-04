@@ -8,14 +8,14 @@
             "name": "g++ build and debug active file",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${fileDirname}/${fileBasenameNoExtension}",
-            "args": [],
+            "program": "/Users/ryanstolys/Documents/GitHub/passwords/password",
+            "args": ["./password", "zfile.txt"],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
+            "cwd": "/Users/ryanstolys/Documents/GitHub/passwords",
             "environment": [],
-            "externalConsole": false,
+            "externalConsole": true,
             "MIMode": "lldb",
-            "preLaunchTask": "g++ build active file"
+            "preLaunchTask": ""
         }
     ]
 }

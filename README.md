@@ -5,5 +5,5 @@ The password is long enough to avoid brute force and contains each type of chara
 
 This program cana also be used to look up the password provided the same seed is used 
 
-The password to access the program is 1
+The password to access the program is SFUnc2020!
 

@@ -68,11 +68,71 @@ class passClass
         void show_passwords();
 
         /////////////////////////////////////////////////////////////////////
+        /// Inserts new element into vector
+        /// 
+        /// @param[in]    name      Name of password to be stored
+        /// @param[in]    password  Password to be stored
+        ///
+        /////////////////////////////////////////////////////////////////////
+        void addElementToList( char* name, char* password );
+
+        /////////////////////////////////////////////////////////////////////
+        /// Removes element from vector
+        ///
+        /// @param[in]    index    index of element to be removed
+        ///
+        /////////////////////////////////////////////////////////////////////
+        void removeElementFromList( int index );
+
+        /////////////////////////////////////////////////////////////////////
+        /// Access Name Element in list
+        ///
+        /// @param[in]    index    index of element to be removed
+        ///
+        /////////////////////////////////////////////////////////////////////
+        char* accessNameElementFromList( int index );
+
+        /////////////////////////////////////////////////////////////////////
+        /// Access password Element in list
+        ///
+        /// @param[in]    index    index of element to be removed
+        ///
+        /////////////////////////////////////////////////////////////////////
+        char* accessPasswordElementFromList( int index );
+
+        /////////////////////////////////////////////////////////////////////
+        /// Modify name Element in list
+        ///
+        /// @param[in]    index     index of element to be removed
+        /// @param[in]    name      name to modify in vector
+        ///
+        /////////////////////////////////////////////////////////////////////
+        void modifyNameElementFromList( int index, char* name );
+
+        /////////////////////////////////////////////////////////////////////
+        /// Modify password Element in list
+        ///
+        /// @param[in]    index     index of element to be removed
+        /// @param[in]    password  password to modify in vector
+        ///
+        /////////////////////////////////////////////////////////////////////
+        void modifyPasswordElementFromList( int index, char* password );
+
+        /////////////////////////////////////////////////////////////////////
+        /// Checks if password list is empty
+        ///
+        /// @return       bool      true if empty, false if not empty
+        ///
+        /////////////////////////////////////////////////////////////////////
+        bool isListEmpty();
+
+    private:
+        /////////////////////////////////////////////////////////////////////
         ///
         /// Class Variables
         ///
         /////////////////////////////////////////////////////////////////////
-        vector<password_t>  vList;          //Why is this an error?
+        vector<password_t>  vList;          
 
     };
 

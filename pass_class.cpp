@@ -32,7 +32,10 @@ int passClass::getNumPass()
 void passClass::add_pass() 
     {
     int         iNumPass = getNumPass();
+   
     string      sType;
+    char        szType[25];
+    char        szPassword[16];
 
     string      sEncrypt;
     char        szEncrypt[16];
@@ -75,16 +78,18 @@ void passClass::add_pass()
     strcpy( szEncrypt, sEncrypt.c_str() );
 
     //Encrypt password and save in file
-    encrpyt( szEncrypt, vList[i].szName, state);
+    encrpyt( szEncrypt, vList[i].szName, state );
 
-    //Store Password
-    vList.push_back(sType.c_str(), "temp");     //How do i initalize the vector element
-
-    //Save encrypted password to data strcuture
+    //Save Password
+    strcpy( szType, sType.c_str() );
+    
+    //Save encrypted password to character array
     for( k = 0; k < 16; k++ )
         {
-        sprintf( &vList[iNumPass].szPassword[k], "%c", state[ k / 4 ][ k % 4 ] );
+        sprintf( &szPassword[k], "%c", state[ k / 4 ][ k % 4 ] );
         }
+    
+    addElementToList( szType, szPassword );
 
     return;
 }
@@ -108,6 +113,9 @@ void passClass::look_up()
     char        szDecrypted[16];
     uint8_t     state[4][4];
 
+    char*       szPassword;
+    char*       szName;
+
 
     //Show passwords
     show_passwords();
@@ -124,10 +132,12 @@ void passClass::look_up()
             if ( !strcmp( sName.c_str(), vList[i].szName ) )
                 {
                 //Create state to decrypt
-                createState( vList[i].szPassword, state ); 
+                szPassword = accessPasswordElementFromList( i );
+                createState( szPassword, state );              
 
                 //Decrypt password
-                decrpyt( vList[i].szName, state);
+                szName = accessNameElementFromList( i );
+                decrpyt( szName, state );
 
                 //Save decrypted password
                 for( i = 0; i < 16; i++ )
@@ -166,9 +176,9 @@ void passClass::look_up()
 /// @param[out]   state         state to decrypt
 ///
 /////////////////////////////////////////////////////////////////////
-void createState( char szPassword[16], uint8_t state[4][4] )
+void passClass::createState( char szPassword[16], uint8_t state[4][4] )
     {
-    for (int i = 0; i < 16; i++)
+    for ( int i = 0; i < 16; i++ )
         {
         state[ i / 4 ][ i % 4 ] = szPassword[i] & 0xff;
         }
@@ -206,13 +216,13 @@ void passClass::delete_pass()
     //Find password and show
     for ( i = 0; i < iNumPass; i++ )
         {
-        if ( !strcmp( sName.c_str(), vList[i].szName ) )
+        if ( !strcmp( sName.c_str(), accessNameElementFromList( i ) ) )
             {
             //Show password
-            cout << "Password for : " << sName << " : " << vList[i].szPassword << " has been deleted" << endl;
+            cout << "Password for : " << sName << " : " << accessPasswordElementFromList( i ) << " has been deleted" << endl;
 
             //Remove element
-            vList.remove(i);        //How do i remove a vector element
+            removeElementFromList( i );      
             }
         }
 
@@ -247,17 +257,23 @@ void passClass::show_passwords()
     int     iPrinted = 0;
     int     i;
 
+    char*   szName;
+
     //Show all passwords
     cout << "\t\tHere is a list of all the password names: \n\n";
 
     for ( i = 0; i < iNumPass; i++ )
         {
-        if( 0 == vList[i].szName[0] )
+        //Get name element from list 
+        szName = accessNameElementFromList( i );
+        
+        //If password doesn't exist, shouldn't occur
+        if( 0 == szName[0] )
             {
             continue;
             }
 
-        cout << vList[i].szName << "\t";
+        cout << szName << "\t";
 
         //Increment the number of printed passwords
         iPrinted++;
@@ -272,4 +288,98 @@ void passClass::show_passwords()
     cout << endl << endl;
 
     return;
+    }
+
+/////////////////////////////////////////////////////////////////////
+/// Inserts new element into vector
+/// 
+/// @param[in]    name      Name of password to be stored
+/// @param[in]    password  Password to be stored
+///
+/////////////////////////////////////////////////////////////////////
+void passClass::addElementToList( char* name, char* password )
+    {
+    password_t addElement; 
+
+    //create element to add to vector
+    strcpy( addElement.szName, name ); 
+    strcpy( addElement.szPassword, password ); 
+
+    vList.push_back( addElement );
+
+    return;
+    }
+
+/////////////////////////////////////////////////////////////////////
+/// Removes element from vector
+///
+/// @param[in]    index    index of element to be removed
+///
+/////////////////////////////////////////////////////////////////////
+void passClass::removeElementFromList( int index )
+    {
+    vList.erase( vList.begin() + index );
+
+    return;
+    }
+
+/////////////////////////////////////////////////////////////////////
+/// Access Name Element in list
+///
+/// @param[in]    index    index of element to be removed
+///
+/////////////////////////////////////////////////////////////////////
+char* passClass::accessNameElementFromList( int index )
+    {
+    return vList[index].szName;
+    }
+
+/////////////////////////////////////////////////////////////////////
+/// Access password Element in list
+///
+/// @param[in]    index    index of element to be removed
+///
+/////////////////////////////////////////////////////////////////////
+char* passClass::accessPasswordElementFromList( int index )
+    {
+    return vList[index].szPassword;
+    }
+
+/////////////////////////////////////////////////////////////////////
+/// Modify name Element in list
+///
+/// @param[in]    index     index of element to be removed
+/// @param[in]    name      name to modify in vector
+///
+/////////////////////////////////////////////////////////////////////
+void passClass::modifyNameElementFromList( int index, char* name )
+    {
+    strcpy( vList[index].szName, name );
+
+    return;
+    }
+
+/////////////////////////////////////////////////////////////////////
+/// Modify password Element in list
+///
+/// @param[in]    index     index of element to be removed
+/// @param[in]    password  password to modify in vector
+///
+/////////////////////////////////////////////////////////////////////
+void passClass::modifyPasswordElementFromList( int index, char* password )
+    {
+    strcpy( vList[index].szPassword, password );
+
+    return;
+    }
+
+/////////////////////////////////////////////////////////////////////
+/// Checks if password list is empty
+///
+/// @return       int      0 == list is not empty, 1 == list is empty
+///
+/////////////////////////////////////////////////////////////////////
+bool passClass::isListEmpty()
+    {
+    return vList.empty();
     }

@@ -3,6 +3,10 @@ Progress:
 No Seg Faults
 Setting state does not work correctly resulting in improper encryption and decrytpions
 
+-- seems to be errors with vector within class. 
+should make change so that vector is private
+can only be accessed by function call with required information 
+
 Recommend converting password.cpp to class member functions of the password type 
 
 By Converting to class, will have ability to add more functionality and checking of what passwords exist
